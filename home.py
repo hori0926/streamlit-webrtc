@@ -6,7 +6,7 @@ logger = logging.getLogger()
 
 st.title("streamlit-webrtc demo!")
 st.info(
-    """👈 Select the demo in China
+    """👈 Select the demo
 """
 )
 
