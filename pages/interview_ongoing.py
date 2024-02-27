@@ -1,3 +1,5 @@
+# 面接中の画面
+
 """Media streamings"""
 import logging
 from pathlib import Path
@@ -45,10 +47,24 @@ webrtc_ctx = webrtc_streamer(
     #in_recorder_factory=in_recorder_factory  #　ここで録音を行う
 )
 
+#とりあえず会話の開始も終了もユーザがボタンで行うことにする
 
-###### ここより下触らないで
+if 'recording' not in st.session_state:
+    st.session_state.recording = False
 
-while st.checkbox('now talking'):
+# ユーザーが「会話開始/終了」ボタンをクリックした時の動作を定義する関数
+def toggle_recording():
+    # 録音の状態をトグルする
+    st.session_state.recording = not st.session_state.recording
+
+# 「会話開始/終了」ボタン
+if st.session_state.recording:
+    st.button('会話終了', on_click=toggle_recording)
+else:
+    st.button('会話開始', on_click=toggle_recording)
+    
+# 録音中の処理
+while st.session_state.recording:
     if webrtc_ctx.audio_receiver:
         try:
             audio_frames = webrtc_ctx.audio_receiver.get_frames(timeout=1)
@@ -65,12 +81,11 @@ while st.checkbox('now talking'):
                 channels=len(audio_frame.layout.channels),
             )
             sound_chunk += sound
-
-###whileループを抜けた時、すなわち録音を終了とした時に以下を実行するように、田村に書いて欲しい！！　            
-    sound_chunk.export("test.wav", format="wav")
+    st.write("録音中")           
+sound_chunk.export("test.wav", format="wav")
             
 
-####### ここより上触らないで
+
 
 st.markdown(
     "The video filter in this demo is based on "
